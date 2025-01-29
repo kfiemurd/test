@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление Материнскими Платами</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #000000; /* Черный фон */
+            color: #ffffff; /* Белый текст для лучшей читаемости на черном фоне */
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #ffffff; /* Белый цвет заголовков */
+        }
+        form {
+            margin-bottom: 20px;
+            background: #1a1a1a; /* Темный фон формы */
+            padding: 15px;
+            border-radius: 5px;
+        }
+        form label {
+            color: #ffffff; /* Белый цвет меток */
+        }
+        form input, form select, form textarea, form button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #333333; /* Темные поля ввода */
+            color: #ffffff; /* Белый текст */
+            border: 1px solid #555555; /* Темная граница */
+            border-radius: 3px;
+        }
+        form button {
+            background-color: #4CAF50; /* Зеленая кнопка по умолчанию */
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        form button:hover {
+            background-color: #45a049;
+        }
+        .action-buttons button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .edit-btn {
+            background-color: #4CAF50; /* Зеленая кнопка редактирования */
+            color: white;
+        }
+        .delete-btn {
+            background-color: #f44336; /* Красная кнопка удаления */
+            color: white;
+        }
+        .plus-one-btn {
+            background-color: #2196F3; /* Синяя кнопка "+1" */
+            color: white;
+        }
+        .summary {
+            background: #1a1a1a; /* Темный фон сводной информации */
+            padding: 15px;
+            border-radius: 5px;
+            color: #ffffff; /* Белый текст */
+            margin-bottom: 20px;
+            text-align: left; /* Выравнивание текста по левому краю */
+        }
+        .summary h3 {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #555555;
+            padding-bottom: 5px;
+        }
+        .summary p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        #cancelEditBtn {
+            display: none;
+            background-color: #555555; /* Темная кнопка отмены */
+            color: white;
+            margin-top: 10px;
+        }
+        #cancelEditBtn:hover {
+            background-color: #777777;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1a1a1a; /* Темный фон таблицы */
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            padding: 12px;
+            border-bottom: 1px solid #555555; /* Темная граница */
+            text-align: left;
+            color: #ffffff; /* Белый текст */
+        }
+        table th {
+            background-color: #333333; /* Темный фон заголовков */
+        }
+        @media (max-width: 600px) {
+            table, form, .summary {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Управление Материнскими Платами</h1>
+
+    <!-- Форма Управления Записями -->
+    <form id="entryForm">
+        <input type="hidden" id="entryId" value="">
+
+        <label for="fio">ФИО:</label>
+        <input type="text" id="fio" name="fio" required>
+
+        <label for="motherboards">Общее количество материнских плат:</label>
+        <input type="number" id="motherboards" name="motherboards" min="0" required>
+
+        <label for="model">Модель:</label>
+        <select id="model" name="model" required>
+            <option value="">Выберите модель</option>
+            <option value="355MB">355MB</option>
+            <option value="634MB">634MB</option>
+            <option value="102RF">102RF</option>
+            <option value="202S">202S</option>
+        </select>
+
+        <label for="pass">Pass:</label>
+        <input type="number" id="pass" name="pass" min="0" required>
+
+        <label for="nok">Nok:</label>
+        <input type="number" id="nok" name="nok" min="0" required>
+
+        <label for="retests">Ретесты:</label>
+        <input type="number" id="retests" name="retests" min="0" required>
+
+        <button type="submit" id="submitBtn">Добавить запись</button>
+        <button type="button" id="cancelEditBtn">Отменить редактирование</button>
+    </form>
+
+    <!-- Сводная Информация -->
+    <h2>Сводная Информация</h2>
+    <div class="summary" id="summary">
+        <!-- Сводная информация будет отображаться здесь -->
+    </div>
+
+    <!-- Список Ремонтов -->
+    <h2>Список Ремонтов</h2>
+    <table id="repairTable">
+        <thead>
+            <tr>
+                <th>Модель</th>
+                <th>Комментарий</th>
+                <th>Количество</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Ремонты будут добавляться здесь -->
+        </tbody>
+    </table>
+
+    <!-- Список Перетестов -->
+    <h2>Список Перетестов</h2>
+    <table id="retestTable">
+        <thead>
+            <tr>
+                <th>Модель</th>
+                <th>Комментарий</th>
+                <th>Количество</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Перетесты будут добавляться здесь -->
+        </tbody>
+    </table>
+
+    <!-- Блок Перетест -->
+    <h2>Перетест</h2>
+    <form id="retestForm">
+        <label for="retestComment">Комментарий:</label>
+        <textarea id="retestComment" name="retestComment" rows="2" required></textarea>
+
+        <label for="retestQuantity">Количество:</label>
+        <input type="number" id="retestQuantity" name="retestQuantity" min="0" required>
+
+        <label for="retestModel">Модель:</label>
+        <select id="retestModel" name="retestModel" required>
+            <option value="">Выберите модель</option>
+            <option value="355MB">355MB</option>
+            <option value="634MB">634MB</option>
+            <option value="102RF">102RF</option>
+            <option value="202S">202S</option>
+        </select>
+
+        <button type="submit">Добавить Перетест</button>
+    </form>
+
+    <!-- Блок Ремонт -->
+    <h2>Ремонт</h2>
+    <form id="repairFormInput">
+        <label for="repairComment">Комментарий:</label>
+        <textarea id="repairComment" name="repairComment" rows="2" required></textarea>
+
+        <label for="repairQuantity">Количество:</label>
+        <input type="number" id="repairQuantity" name="repairQuantity" min="0" required>
+
+        <label for="repairModel">Модель:</label>
+        <select id="repairModel" name="repairModel" required>
+            <option value="">Выберите модель</option>
+            <option value="355MB">355MB</option>
+            <option value="634MB">634MB</option>
+            <option value="102RF">102RF</option>
+            <option value="202S">202S</option>
+        </select>
+
+        <button type="submit">Добавить Ремонт</button>
+    </form>
+
+    <!-- Таблица Записей -->
+    <h2>Список Записей</h2>
+    <table id="entriesTable">
+        <thead>
+            <tr>
+                <th>ФИО</th>
+                <th>Общее количество материнских плат</th>
+                <th>Модель</th>
+                <th>Количество OK</th>
+                <th>Количество Nok</th>
+                <th>Количество Ретестов</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Записи будут добавляться здесь -->
+        </tbody>
+    </table>
+
+    <!-- Блок Простои -->
+    <h2>Простои</h2>
+    <form id="downtimeForm">
+        <label for="downtimeFio">ФИО:</label>
+        <input type="text" id="downtimeFio" name="downtimeFio" required>
+
+        <label for="downtimeCount">Количество простоев:</label>
+        <input type="number" id="downtimeCount" name="downtimeCount" min="0" required>
+
+        <label for="downtimeTime">Общее время (часы):</label>
+        <input type="number" id="downtimeTime" name="downtimeTime" min="0" step="0.1" required>
+
+        <label for="downtimeComment">Комментарий:</label>
+        <textarea id="downtimeComment" name="downtimeComment" rows="2" required></textarea>
+
+        <button type="submit">Добавить Простой</button>
+    </form>
+
+    <!-- Таблица Простои -->
+    <h2>Список Простей</h2>
+    <table id="downtimeTable">
+        <thead>
+            <tr>
+                <th>ФИО</th>
+                <th>Количество простоев</th>
+                <th>Общее время (часы)</th>
+                <th>Комментарий</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Простои будут добавляться здесь -->
+        </tbody>
+    </table>
+
+    <script>
+        // Функции для Управления Записями
+        function getEntries() {
+            const entries = localStorage.getItem('entries');
+            return entries ? JSON.parse(entries) : [];
+        }
+
+        function saveEntries(entries) {
+            localStorage.setItem('entries', JSON.stringify(entries));
+        }
+
+        function displayEntries() {
+            const entries = getEntries();
+            const tbody = document.querySelector('#entriesTable tbody');
+            tbody.innerHTML = '';
+
+            entries.forEach((entry, index) => {
+                const tr = document.createElement('tr');
+
+                const tdFio = document.createElement('td');
+                tdFio.textContent = entry.fio;
+                tr.appendChild(tdFio);
+
+                const tdMotherboards = document.createElement('td');
+                tdMotherboards.textContent = entry.motherboards;
+                tr.appendChild(tdMotherboards);
+
+                const tdModel = document.createElement('td');
+                tdModel.textContent = entry.model;
+                tr.appendChild(tdModel);
+
+                const tdPass = document.createElement('td');
+                tdPass.textContent = entry.pass;
+                tr.appendChild(tdPass);
+
+                const tdNok = document.createElement('td');
+                tdNok.textContent = entry.nok;
+                tr.appendChild(tdNok);
+
+                const tdRetests = document.createElement('td');
+                tdRetests.textContent = entry.retests;
+                tr.appendChild(tdRetests);
+
+                // Действия: Редактировать и Удалить
+                const tdActions = document.createElement('td');
+                tdActions.classList.add('action-buttons');
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Редактировать';
+                editButton.classList.add('edit-btn');
+                editButton.addEventListener('click', () => editEntry(index));
+                tdActions.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Удалить';
+                deleteButton.classList.add('delete-btn');
+                deleteButton.addEventListener('click', () => deleteEntry(index));
+                tdActions.appendChild(deleteButton);
+
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const entries = getEntries();
+            const summaryDiv = document.getElementById('summary');
+
+            const models = ["355MB", "634MB", "102RF", "202S"];
+            let summaryHTML = '';
+
+            models.forEach(model => {
+                const modelEntries = entries.filter(entry => entry.model === model);
+                const totalMotherboards = modelEntries.reduce((sum, entry) => sum + Number(entry.motherboards), 0);
+                const okCount = modelEntries.reduce((sum, entry) => sum + Number(entry.pass), 0);
+                const nokCount = modelEntries.reduce((sum, entry) => sum + Number(entry.nok), 0);
+                const retestCount = modelEntries.reduce((sum, entry) => sum + Number(entry.retests), 0);
+
+                summaryHTML += `
+                    <h3>_${model}</h3>
+                    <p><strong>Общее количество плат:</strong> ${totalMotherboards}</p>
+                    <p><strong>Количество OK:</strong> ${okCount}</p>
+                    <p><strong>Количество Nok:</strong> ${nokCount}</p>
+                    <p><strong>Количество Ретестов:</strong> ${retestCount}</p>
+                `;
+            });
+
+            summaryDiv.innerHTML = summaryHTML;
+        }
+
+        document.getElementById('entryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const entryId = document.getElementById('entryId').value;
+            const fio = document.getElementById('fio').value.trim();
+            const motherboards = document.getElementById('motherboards').value;
+            const model = document.getElementById('model').value;
+            const pass = document.getElementById('pass').value;
+            const nok = document.getElementById('nok').value;
+            const retests = document.getElementById('retests').value;
+
+            if (fio === '' || motherboards === '' || model === '' || pass === '' || nok === '' || retests === '') {
+                alert('Пожалуйста, заполните все обязательные поля.');
+                return;
+            }
+
+            const entries = getEntries();
+
+            if (entryId === '') {
+                // Добавление новой записи
+                const newEntry = { fio, motherboards, model, pass, nok, retests };
+                entries.push(newEntry);
+            } else {
+                // Редактирование существующей записи
+                entries[entryId] = { fio, motherboards, model, pass, nok, retests };
+                // Сброс формы после редактирования
+                document.getElementById('submitBtn').textContent = 'Добавить запись';
+                document.getElementById('cancelEditBtn').style.display = 'none';
+                document.getElementById('entryId').value = '';
+            }
+
+            saveEntries(entries);
+            displayEntries();
+
+            // Очистка формы
+            document.getElementById('entryForm').reset();
+        });
+
+        // Функция для редактирования записи
+        function editEntry(index) {
+            const entries = getEntries();
+            const entry = entries[index];
+            if (!entry) return;
+
+            document.getElementById('fio').value = entry.fio;
+            document.getElementById('motherboards').value = entry.motherboards;
+            document.getElementById('model').value = entry.model;
+            document.getElementById('pass').value = entry.pass;
+            document.getElementById('nok').value = entry.nok;
+            document.getElementById('retests').value = entry.retests;
+            document.getElementById('entryId').value = index;
+            document.getElementById('submitBtn').textContent = 'Сохранить изменения';
+            document.getElementById('cancelEditBtn').style.display = 'block';
+        }
+
+        // Функция для удаления записи
+        function deleteEntry(index) {
+            if (!confirm('Вы уверены, что хотите удалить эту запись?')) return;
+
+            const entries = getEntries();
+            entries.splice(index, 1);
+            saveEntries(entries);
+            displayEntries();
+        }
+
+        // Обработчик кнопки отмены редактирования
+        document.getElementById('cancelEditBtn').addEventListener('click', function() {
+            document.getElementById('entryForm').reset();
+            document.getElementById('entryId').value = '';
+            document.getElementById('submitBtn').textContent = 'Добавить запись';
+            this.style.display = 'none';
+        });
+
+        // Функции для Перетеста
+        function getRetests() {
+            const retests = localStorage.getItem('retests');
+            return retests ? JSON.parse(retests) : [];
+        }
+
+        function saveRetests(retests) {
+            localStorage.setItem('retests', JSON.stringify(retests));
+        }
+
+        function displayRetests() {
+            const retests = getRetests();
+            const tbody = document.querySelector('#retestTable tbody');
+            tbody.innerHTML = '';
+
+            // Сортировка по модели
+            retests.sort((a, b) => a.model.localeCompare(b.model));
+
+            retests.forEach((retest, index) => {
+                const tr = document.createElement('tr');
+
+                const tdModel = document.createElement('td');
+                tdModel.textContent = retest.model;
+                tr.appendChild(tdModel);
+
+                const tdComment = document.createElement('td');
+                tdComment.textContent = retest.comment;
+                tr.appendChild(tdComment);
+
+                const tdQuantity = document.createElement('td');
+                tdQuantity.textContent = retest.quantity;
+                tr.appendChild(tdQuantity);
+
+                // Действия: Редактировать, Удалить, +1
+                const tdActions = document.createElement('td');
+                tdActions.classList.add('action-buttons');
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Редактировать';
+                editButton.classList.add('edit-btn');
+                editButton.addEventListener('click', () => editRetest(index));
+                tdActions.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Удалить';
+                deleteButton.classList.add('delete-btn');
+                deleteButton.addEventListener('click', () => deleteRetest(index));
+                tdActions.appendChild(deleteButton);
+
+                const plusOneButton = document.createElement('button');
+                plusOneButton.textContent = '+1';
+                plusOneButton.classList.add('plus-one-btn');
+                plusOneButton.addEventListener('click', () => incrementRetestQuantity(index));
+                tdActions.appendChild(plusOneButton);
+
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('retestForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const comment = document.getElementById('retestComment').value.trim();
+            const quantity = document.getElementById('retestQuantity').value;
+            const model = document.getElementById('retestModel').value;
+
+            if (comment === '' || quantity === '' || model === '') {
+                alert('Пожалуйста, заполните все обязательные поля.');
+                return;
+            }
+
+            const retests = getRetests();
+            const newRetest = { comment, quantity, model };
+            retests.push(newRetest);
+            saveRetests(retests);
+            displayRetests();
+
+            // Очистка формы
+            document.getElementById('retestForm').reset();
+        });
+
+        // Функция для редактирования перетеста
+        function editRetest(index) {
+            const retests = getRetests();
+            const retest = retests[index];
+            if (!retest) return;
+
+            document.getElementById('retestComment').value = retest.comment;
+            document.getElementById('retestQuantity').value = retest.quantity;
+            document.getElementById('retestModel').value = retest.model;
+
+            // Удаление текущего перетеста для обновления после редактирования
+            retests.splice(index, 1);
+            saveRetests(retests);
+            displayRetests();
+        }
+
+        // Функция для удаления перетеста
+        function deleteRetest(index) {
+            if (!confirm('Вы уверены, что хотите удалить этот перетест?')) return;
+
+            const retests = getRetests();
+            retests.splice(index, 1);
+            saveRetests(retests);
+            displayRetests();
+        }
+
+        // Функция для увеличения количества перетеста на 1
+        function incrementRetestQuantity(index) {
+            const retests = getRetests();
+            if (retests[index]) {
+                retests[index].quantity = Number(retests[index].quantity) + 1;
+                saveRetests(retests);
+                displayRetests();
+            }
+        }
+
+        // Функции для Ремонта
+        function getRepairs() {
+            const repairs = localStorage.getItem('repairs');
+            return repairs ? JSON.parse(repairs) : [];
+        }
+
+        function saveRepairs(repairs) {
+            localStorage.setItem('repairs', JSON.stringify(repairs));
+        }
+
+        function displayRepairs() {
+            const repairs = getRepairs();
+            const tbody = document.querySelector('#repairTable tbody');
+            tbody.innerHTML = '';
+
+            repairs.forEach((repair, index) => {
+                const tr = document.createElement('tr');
+
+                const tdModel = document.createElement('td');
+                tdModel.textContent = repair.model;
+                tr.appendChild(tdModel);
+
+                const tdComment = document.createElement('td');
+                tdComment.textContent = repair.comment;
+                tr.appendChild(tdComment);
+
+                const tdQuantity = document.createElement('td');
+                tdQuantity.textContent = repair.quantity;
+                tr.appendChild(tdQuantity);
+
+                // Действия: Редактировать и Удалить
+                const tdActions = document.createElement('td');
+                tdActions.classList.add('action-buttons');
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Редактировать';
+                editButton.classList.add('edit-btn');
+                editButton.addEventListener('click', () => editRepair(index));
+                tdActions.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Удалить';
+                deleteButton.classList.add('delete-btn');
+                deleteButton.addEventListener('click', () => deleteRepair(index));
+                tdActions.appendChild(deleteButton);
+
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('repairFormInput').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const comment = document.getElementById('repairComment').value.trim();
+            const quantity = document.getElementById('repairQuantity').value;
+            const model = document.getElementById('repairModel').value;
+
+            if (comment === '' || quantity === '' || model === '') {
+                alert('Пожалуйста, заполните все обязательные поля.');
+                return;
+            }
+
+            const repairs = getRepairs();
+            const newRepair = { comment, quantity, model };
+            repairs.push(newRepair);
+            saveRepairs(repairs);
+            displayRepairs();
+
+            // Очистка формы
+            document.getElementById('repairFormInput').reset();
+        });
+
+        // Функция для редактирования ремонта
+        function editRepair(index) {
+            const repairs = getRepairs();
+            const repair = repairs[index];
+            if (!repair) return;
+
+            document.getElementById('repairComment').value = repair.comment;
+            document.getElementById('repairQuantity').value = repair.quantity;
+            document.getElementById('repairModel').value = repair.model;
+
+            // Удаление текущего ремонта для обновления после редактирования
+            repairs.splice(index, 1);
+            saveRepairs(repairs);
+            displayRepairs();
+        }
+
+        // Функция для удаления ремонта
+        function deleteRepair(index) {
+            if (!confirm('Вы уверены, что хотите удалить этот ремонт?')) return;
+
+            const repairs = getRepairs();
+            repairs.splice(index, 1);
+            saveRepairs(repairs);
+            displayRepairs();
+        }
+
+        // Функции для Простои
+        function getDowntimes() {
+            const downtimes = localStorage.getItem('downtimes');
+            return downtimes ? JSON.parse(downtimes) : [];
+        }
+
+        function saveDowntimes(downtimes) {
+            localStorage.setItem('downtimes', JSON.stringify(downtimes));
+        }
+
+        function displayDowntimes() {
+            const downtimes = getDowntimes();
+            const tbody = document.querySelector('#downtimeTable tbody');
+            tbody.innerHTML = '';
+
+            downtimes.forEach((downtime, index) => {
+                const tr = document.createElement('tr');
+
+                const tdFio = document.createElement('td');
+                tdFio.textContent = downtime.fio;
+                tr.appendChild(tdFio);
+
+                const tdCount = document.createElement('td');
+                tdCount.textContent = downtime.count;
+                tr.appendChild(tdCount);
+
+                const tdTime = document.createElement('td');
+                tdTime.textContent = downtime.time;
+                tr.appendChild(tdTime);
+
+                const tdComment = document.createElement('td');
+                tdComment.textContent = downtime.comment;
+                tr.appendChild(tdComment);
+
+                // Действия: Редактировать и Удалить
+                const tdActions = document.createElement('td');
+                tdActions.classList.add('action-buttons');
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Редактировать';
+                editButton.classList.add('edit-btn');
+                editButton.addEventListener('click', () => editDowntime(index));
+                tdActions.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Удалить';
+                deleteButton.classList.add('delete-btn');
+                deleteButton.addEventListener('click', () => deleteDowntime(index));
+                tdActions.appendChild(deleteButton);
+
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('downtimeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const fio = document.getElementById('downtimeFio').value.trim();
+            const count = document.getElementById('downtimeCount').value;
+            const time = document.getElementById('downtimeTime').value;
+            const comment = document.getElementById('downtimeComment').value.trim();
+
+            if (fio === '' || count === '' || time === '' || comment === '') {
+                alert('Пожалуйста, заполните все обязательные поля.');
+                return;
+            }
+
+            const downtimes = getDowntimes();
+            const newDowntime = { fio, count, time, comment };
+            downtimes.push(newDowntime);
+            saveDowntimes(downtimes);
+            displayDowntimes();
+
+            // Очистка формы
+            document.getElementById('downtimeForm').reset();
+        });
+
+        // Функция для редактирования простоя
+        function editDowntime(index) {
+            const downtimes = getDowntimes();
+            const downtime = downtimes[index];
+            if (!downtime) return;
+
+            document.getElementById('downtimeFio').value = downtime.fio;
+            document.getElementById('downtimeCount').value = downtime.count;
+            document.getElementById('downtimeTime').value = downtime.time;
+            document.getElementById('downtimeComment').value = downtime.comment;
+
+            // Удаление текущего простоя для обновления после редактирования
+            downtimes.splice(index, 1);
+            saveDowntimes(downtimes);
+            displayDowntimes();
+        }
+
+        // Функция для удаления простоя
+        function deleteDowntime(index) {
+            if (!confirm('Вы уверены, что хотите удалить этот простой?')) return;
+
+            const downtimes = getDowntimes();
+            downtimes.splice(index, 1);
+            saveDowntimes(downtimes);
+            displayDowntimes();
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            displayEntries();
+            displayRetests();
+            displayRepairs();
+            displayDowntimes();
+        });
+    </script>
+
+</body>
+</html>
